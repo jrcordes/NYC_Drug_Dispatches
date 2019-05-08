@@ -1,0 +1,7 @@
+name: "nyc-dispatch-website"
+output_dir: "."
+navbar:
+  title: "NYC Drug-related Dispatches"
+  left:
+    - text: "Home"
+      href: index.html

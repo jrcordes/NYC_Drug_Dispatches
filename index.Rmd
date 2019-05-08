@@ -1,0 +1,203 @@
+---
+title: "Spatiotemporal Patterns in Drug-related EMS Disaptchs NYC: 2013-2017"
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+```{r code, include=FALSE, warning=FALSE, message=FALSE}
+############### Libraries ##############################################
+library(dplyr, verbose = FALSE, quietly = TRUE)
+library(epitools, verbose = FALSE, quietly = TRUE)
+library(ggplot2, verbose = FALSE, quietly = TRUE)
+library(rgdal, verbose = FALSE, quietly = TRUE)
+library(sp, verbose = FALSE, quietly = TRUE)
+library(sf, verbose = FALSE, quietly = TRUE)
+library(st, verbose = FALSE, quietly = TRUE)
+library(maptools, verbose = FALSE, quietly = TRUE)
+library(rgeos, verbose = FALSE, quietly = TRUE)
+library(tidyr, verbose = FALSE, quietly = TRUE)
+library(ape, verbose = FALSE, quietly = TRUE)
+library(spdep, verbose = FALSE, quietly = TRUE)
+library(geojsonio, verbose = FALSE, quietly = TRUE)
+library(rmapshaper, verbose = FALSE, quietly = TRUE)
+library(geosphere, verbose = FALSE, quietly = TRUE)
+library(maps, verbose = FALSE, quietly = TRUE)
+library(gganimate, verbose = FALSE, quietly = TRUE)
+library(animation, verbose = FALSE, quietly = TRUE)
+library(gifski, verbose = FALSE, quietly = TRUE)
+library(png, verbose = FALSE, quietly = TRUE)
+library(transformr, verbose = FALSE, quietly = TRUE)
+library(reshape2, verbose = FALSE, quietly = TRUE)
+library(magick, verbose = FALSE, quietly = TRUE)
+library(purrr, verbose = FALSE, quietly = TRUE)
+library(ggsn, verbose = FALSE, quietly = TRUE)
+
+freq_Jan13 <- image_read("freq_Jan13.png")
+freq_Feb13 <- image_read("freq_Feb13.png")
+freq_Mar13 <- image_read("freq_Mar13.png")
+freq_Apr13 <- image_read("freq_Apr13.png")
+freq_May13 <- image_read("freq_May13.png")
+freq_Jun13 <- image_read("freq_Jun13.png")
+freq_Jul13 <- image_read("freq_Jul13.png")
+freq_Aug13 <- image_read("freq_Aug13.png")
+freq_Sep13 <- image_read("freq_Sep13.png")
+freq_Oct13 <- image_read("freq_Oct13.png")
+freq_Nov13 <- image_read("freq_Nov13.png")
+freq_Dec13 <- image_read("freq_Dec13.png")
+freq_Jan14 <- image_read("freq_Jan14.png")
+freq_Feb14 <- image_read("freq_Feb14.png")
+freq_Mar14 <- image_read("freq_Mar14.png")
+freq_Apr14 <- image_read("freq_Apr14.png")
+freq_May14 <- image_read("freq_May14.png")
+freq_Jun14 <- image_read("freq_Jun14.png")
+freq_Jul14 <- image_read("freq_Jul14.png")
+freq_Aug14 <- image_read("freq_Aug14.png")
+freq_Sep14 <- image_read("freq_Sep14.png")
+freq_Oct14 <- image_read("freq_Oct14.png")
+freq_Nov14 <- image_read("freq_Nov14.png")
+freq_Dec14 <- image_read("freq_Dec14.png")
+freq_Jan15 <- image_read("freq_Jan15.png")
+freq_Feb15 <- image_read("freq_Feb15.png")
+freq_Mar15 <- image_read("freq_Mar15.png")
+freq_Apr15 <- image_read("freq_Apr15.png")
+freq_May15 <- image_read("freq_May15.png")
+freq_Jun15 <- image_read("freq_Jun15.png")
+freq_Jul15 <- image_read("freq_Jul15.png")
+freq_Aug15 <- image_read("freq_Aug15.png")
+freq_Sep15 <- image_read("freq_Sep15.png")
+freq_Oct15 <- image_read("freq_Oct15.png")
+freq_Nov15 <- image_read("freq_Nov15.png")
+freq_Dec15 <- image_read("freq_Dec15.png")
+freq_Jan16 <- image_read("freq_Jan16.png")
+freq_Feb16 <- image_read("freq_Feb16.png")
+freq_Mar16 <- image_read("freq_Mar16.png")
+freq_Apr16 <- image_read("freq_Apr16.png")
+freq_May16 <- image_read("freq_May16.png")
+freq_Jun16 <- image_read("freq_Jun16.png")
+freq_Jul16 <- image_read("freq_Jul16.png")
+freq_Aug16 <- image_read("freq_Aug16.png")
+freq_Sep16 <- image_read("freq_Sep16.png")
+freq_Oct16 <- image_read("freq_Oct16.png")
+freq_Nov16 <- image_read("freq_Nov16.png")
+freq_Dec16 <- image_read("freq_Dec16.png")
+freq_Jan17 <- image_read("freq_Jan17.png")
+freq_Feb17 <- image_read("freq_Feb17.png")
+freq_Mar17 <- image_read("freq_Mar17.png")
+freq_Apr17 <- image_read("freq_Apr17.png")
+freq_May17 <- image_read("freq_May17.png")
+freq_Jun17 <- image_read("freq_Jun17.png")
+freq_Jul17 <- image_read("freq_Jul17.png")
+freq_Aug17 <- image_read("freq_Aug17.png")
+freq_Sep17 <- image_read("freq_Sep17.png")
+freq_Oct17 <- image_read("freq_Oct17.png")
+freq_Nov17 <- image_read("freq_Nov17.png")
+freq_Dec17 <- image_read("freq_Dec17.png")
+
+# Create morphing animation
+freq_images <- image_scale(c(freq_Jan13,freq_Feb13,freq_Mar13,freq_Apr13,
+                               freq_May13,freq_Jun13,freq_Jul13,freq_Aug13,
+                               freq_Sep13,freq_Oct13,freq_Nov13,freq_Dec13,
+                               freq_Jan14,freq_Feb14,freq_Mar14,freq_Apr14,
+                               freq_May14,freq_Jun14,freq_Jul14,freq_Aug14,
+                               freq_Sep14,freq_Oct14,freq_Nov14,freq_Dec14,
+                               freq_Jan15,freq_Feb15,freq_Mar15,freq_Apr15,
+                               freq_May15,freq_Jun15,freq_Jul15,freq_Aug15,
+                               freq_Sep15,freq_Oct15,freq_Nov15,freq_Dec15,
+                               freq_Jan16,freq_Feb16,freq_Mar16,freq_Apr16,
+                               freq_May16,freq_Jun16,freq_Jul16,freq_Aug16,
+                               freq_Sep16,freq_Oct16,freq_Nov16,freq_Dec16,
+                               freq_Jan17,freq_Feb17,freq_Mar17,freq_Apr17,
+                               freq_May17,freq_Jun17,freq_Jul17,freq_Aug17,
+                               freq_Sep17,freq_Oct17,freq_Nov17,freq_Dec17), "400")
+
+lmoran_Jan13 <- image_read("lmoran_Jan13.png")
+lmoran_Feb13 <- image_read("lmoran_Feb13.png")
+lmoran_Mar13 <- image_read("lmoran_Mar13.png")
+lmoran_Apr13 <- image_read("lmoran_Apr13.png")
+lmoran_May13 <- image_read("lmoran_May13.png")
+lmoran_Jun13 <- image_read("lmoran_Jun13.png")
+lmoran_Jul13 <- image_read("lmoran_Jul13.png")
+lmoran_Aug13 <- image_read("lmoran_Aug13.png")
+lmoran_Sep13 <- image_read("lmoran_Sep13.png")
+lmoran_Oct13 <- image_read("lmoran_Oct13.png")
+lmoran_Nov13 <- image_read("lmoran_Nov13.png")
+lmoran_Dec13 <- image_read("lmoran_Dec13.png")
+lmoran_Jan14 <- image_read("lmoran_Jan14.png")
+lmoran_Feb14 <- image_read("lmoran_Feb14.png")
+lmoran_Mar14 <- image_read("lmoran_Mar14.png")
+lmoran_Apr14 <- image_read("lmoran_Apr14.png")
+lmoran_May14 <- image_read("lmoran_May14.png")
+lmoran_Jun14 <- image_read("lmoran_Jun14.png")
+lmoran_Jul14 <- image_read("lmoran_Jul14.png")
+lmoran_Aug14 <- image_read("lmoran_Aug14.png")
+lmoran_Sep14 <- image_read("lmoran_Sep14.png")
+lmoran_Oct14 <- image_read("lmoran_Oct14.png")
+lmoran_Nov14 <- image_read("lmoran_Nov14.png")
+lmoran_Dec14 <- image_read("lmoran_Dec14.png")
+lmoran_Jan15 <- image_read("lmoran_Jan15.png")
+lmoran_Feb15 <- image_read("lmoran_Feb15.png")
+lmoran_Mar15 <- image_read("lmoran_Mar15.png")
+lmoran_Apr15 <- image_read("lmoran_Apr15.png")
+lmoran_May15 <- image_read("lmoran_May15.png")
+lmoran_Jun15 <- image_read("lmoran_Jun15.png")
+lmoran_Jul15 <- image_read("lmoran_Jul15.png")
+lmoran_Aug15 <- image_read("lmoran_Aug15.png")
+lmoran_Sep15 <- image_read("lmoran_Sep15.png")
+lmoran_Oct15 <- image_read("lmoran_Oct15.png")
+lmoran_Nov15 <- image_read("lmoran_Nov15.png")
+lmoran_Dec15 <- image_read("lmoran_Dec15.png")
+lmoran_Jan16 <- image_read("lmoran_Jan16.png")
+lmoran_Feb16 <- image_read("lmoran_Feb16.png")
+lmoran_Mar16 <- image_read("lmoran_Mar16.png")
+lmoran_Apr16 <- image_read("lmoran_Apr16.png")
+lmoran_May16 <- image_read("lmoran_May16.png")
+lmoran_Jun16 <- image_read("lmoran_Jun16.png")
+lmoran_Jul16 <- image_read("lmoran_Jul16.png")
+lmoran_Aug16 <- image_read("lmoran_Aug16.png")
+lmoran_Sep16 <- image_read("lmoran_Sep16.png")
+lmoran_Oct16 <- image_read("lmoran_Oct16.png")
+lmoran_Nov16 <- image_read("lmoran_Nov16.png")
+lmoran_Dec16 <- image_read("lmoran_Dec16.png")
+lmoran_Jan17 <- image_read("lmoran_Jan17.png")
+lmoran_Feb17 <- image_read("lmoran_Feb17.png")
+lmoran_Mar17 <- image_read("lmoran_Mar17.png")
+lmoran_Apr17 <- image_read("lmoran_Apr17.png")
+lmoran_May17 <- image_read("lmoran_May17.png")
+lmoran_Jun17 <- image_read("lmoran_Jun17.png")
+lmoran_Jul17 <- image_read("lmoran_Jul17.png")
+lmoran_Aug17 <- image_read("lmoran_Aug17.png")
+lmoran_Sep17 <- image_read("lmoran_Sep17.png")
+lmoran_Oct17 <- image_read("lmoran_Oct17.png")
+lmoran_Nov17 <- image_read("lmoran_Nov17.png")
+lmoran_Dec17 <- image_read("lmoran_Dec17.png")
+
+# Create morphing animation
+lmoran_images <- image_scale(c(lmoran_Jan13,lmoran_Feb13,lmoran_Mar13,lmoran_Apr13,
+                               lmoran_May13,lmoran_Jun13,lmoran_Jul13,lmoran_Aug13,
+                               lmoran_Sep13,lmoran_Oct13,lmoran_Nov13,lmoran_Dec13,
+                               lmoran_Jan14,lmoran_Feb14,lmoran_Mar14,lmoran_Apr14,
+                               lmoran_May14,lmoran_Jun14,lmoran_Jul14,lmoran_Aug14,
+                               lmoran_Sep14,lmoran_Oct14,lmoran_Nov14,lmoran_Dec14,
+                               lmoran_Jan15,lmoran_Feb15,lmoran_Mar15,lmoran_Apr15,
+                               lmoran_May15,lmoran_Jun15,lmoran_Jul15,lmoran_Aug15,
+                               lmoran_Sep15,lmoran_Oct15,lmoran_Nov15,lmoran_Dec15,
+                               lmoran_Jan16,lmoran_Feb16,lmoran_Mar16,lmoran_Apr16,
+                               lmoran_May16,lmoran_Jun16,lmoran_Jul16,lmoran_Aug16,
+                               lmoran_Sep16,lmoran_Oct16,lmoran_Nov16,lmoran_Dec16,
+                               lmoran_Jan17,lmoran_Feb17,lmoran_Mar17,lmoran_Apr17,
+                               lmoran_May17,lmoran_Jun17,lmoran_Jul17,lmoran_Aug17,
+                               lmoran_Sep17,lmoran_Oct17,lmoran_Nov17,lmoran_Dec17), "400")
+```
+
+Monthly Frequency of Drug-related EMS Dispatches by Zip Codes
+
+```{r freq_animation}
+image_animate(freq_images, fps = 1)
+```
+
+Monthly Local Moran's I with False-discovery Rate Correction
+
+```{r lmoran_animation}
+image_animate(lmoran_images, fps = 1)
+```
