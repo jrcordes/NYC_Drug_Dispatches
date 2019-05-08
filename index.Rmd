@@ -1,5 +1,5 @@
 ---
-title: "Spatiotemporal Patterns in Drug-related EMS Disaptchs NYC: 2013-2017"
+title: "Spatiotemporal Patterns in Drug-related EMS Dispatches NYC: 2013-2017"
 ---
 
 ```{r setup, include=FALSE, warning=FALSE, message=FALSE}
