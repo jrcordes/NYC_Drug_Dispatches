@@ -190,13 +190,13 @@ lmoran_images <- image_scale(c(lmoran_Jan13,lmoran_Feb13,lmoran_Mar13,lmoran_Apr
                                lmoran_Sep17,lmoran_Oct17,lmoran_Nov17,lmoran_Dec17), "400")
 ```
 
-Monthly Frequency of Drug-related EMS Dispatches by Zip Codes
+Fig. S4 Monthly Frequency of Drug-related EMS Dispatches by Zip Codes
 
 ```{r freq_animation}
 image_animate(freq_images, fps = 1)
 ```
 
-Monthly Local Moran's I with False-discovery Rate Correction
+Fig. S5 Monthly Local Moran's I with False-discovery Rate Correction
 
 ```{r lmoran_animation}
 image_animate(lmoran_images, fps = 1)
